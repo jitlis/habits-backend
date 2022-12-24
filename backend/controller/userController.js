@@ -2,6 +2,16 @@ const User = require('../dataModel/user')
 const asyncHandler = require('express-async-handler')
 const bcrypt = require('bcrypt')
 
+const getUsers = asyncHandler(async (req, res) => {
+    const users = await User.find().select('-password') //maybe add lean
+
+    if (!users?.length) {
+        return res.status(400).json({ message: 'No users found' })
+    }
+
+    res.json(users)
+}
+)
 const createUser = asyncHandler(async (req, res) => {
     const {username, password} = req.body;
     if(!username){
@@ -26,10 +36,9 @@ const createUser = asyncHandler(async (req, res) => {
 
     const userObject = { username, "password": hashedPwd}
 
-    // Create user
     const user = await User.create(userObject)
 
-    if (user) { //created 
+    if (user) { 
         res.status(201).json({ message: `New user ${username} created` })
     } else {
         res.status(400).json({ message: 'Invalid user data received' })
@@ -46,7 +55,7 @@ const deleteUser = asyncHandler(async (req, res) => {
     }
 
     // check if user exists
-    const user = await User.findById(id).exec()
+    const user = await User.findById(id).exec() //return promise
 
     if (!user) {
         return res.status(400).json({ message: 'User does not exist' })
@@ -59,7 +68,43 @@ const deleteUser = asyncHandler(async (req, res) => {
     res.json(reply)
 })
 
+const updateUser = asyncHandler (async (req, res) => {
+    const { id, username, password } = req.body
+
+    if (!id || !username || !Array.isArray(roles) || !roles.length || typeof active !== 'boolean') {
+        return res.status(400).json({ message: 'All fields except password are required' })
+    }
+
+    // check if user exists
+    const user = await User.findById(id).exec()
+
+    if (!user) {
+        return res.status(400).json({ message: 'User not found' })
+    }
+
+    // check for duplicate 
+    const duplicate = await User.findOne({ username }).lean().exec()
+
+    // Allow updates to the original user 
+    if (duplicate && duplicate?._id.toString() !== id) {
+        return res.status(409).json({ message: 'Duplicate username' })
+    }
+
+    user.username = username
+
+    if (password) {
+        // Hash password 
+        user.password = await bcrypt.hash(password, 10) 
+    }
+
+    const updatedUser = await user.save()
+
+    res.json({ message: `${updatedUser.username} updated` })
+})
+
 module.exports = {
+    getUsers,
     createUser,
-    deleteUser
+    deleteUser,
+    updateUser
 }
