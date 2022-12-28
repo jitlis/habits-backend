@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const corsConfig = require("./config/corsConfig");
 const mongoose = require("mongoose");
 const userRoute = require("./routes/userRoutes");
+const taskRoute = require('./routes/taskRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3500;
@@ -24,6 +25,7 @@ try {
 mongoConnect();
 
 app.use('/user', userRoute);
+app.use('/task', taskRoute);
 
 mongoose.connection.once('open', () => {
     console.log('Connected to MongoDB')

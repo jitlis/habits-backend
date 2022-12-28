@@ -18,4 +18,4 @@ const taskSchema = new mongoose.Schema(
 
     }
 )
-module.exports = mongoose.model("Task", noteSchema);
+module.exports = mongoose.model("Task", taskSchema);
