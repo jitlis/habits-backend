@@ -71,7 +71,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 const updateUser = asyncHandler (async (req, res) => {
     const { id, username, password } = req.body
 
-    if (!id || !username || !Array.isArray(roles) || !roles.length || typeof active !== 'boolean') {
+    if (!id || !username) {
         return res.status(400).json({ message: 'All fields except password are required' })
     }
 
