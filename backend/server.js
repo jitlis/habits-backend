@@ -7,6 +7,8 @@ const corsConfig = require("./config/corsConfig");
 const mongoose = require("mongoose");
 const userRoute = require("./routes/userRoutes");
 const taskRoute = require('./routes/taskRoutes');
+const authRoute = require('./routes/authRoutes')
+
 
 const app = express();
 const PORT = process.env.PORT || 3500;
@@ -24,6 +26,7 @@ try {
 
 mongoConnect();
 
+app.use('/login', authRoute);
 app.use('/user', userRoute);
 app.use('/task', taskRoute);
 

@@ -2,6 +2,7 @@ const Task = require('../dataModel/task');
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcrypt');
 
+
 const getTasks = asyncHandler(async (req, res) => {
     const tasks = await Task.find().lean();
 
